@@ -1,10 +1,11 @@
 swagger: '2.0'
 info:
   version: '1.0.0'
-  title: "[Hackathon] Adidas Wishlist API"
+  title: "[Onboarding] Adidas Wishlist API"
+  # Change the contact details to yours.
   contact:
-      name: "Samir AMZANI / Ignacio Alzorriz"
-      email: "samir.amzani@adidas.com"
+      name: "Andrzej Jarzyna / Samir AMZANI / Ignacio Alzorriz"
+      email: "andrzej.jarzyna@adidas.com"
   description: |
     A Simple adidas product API for the On-Boarding hackathon.
     [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon
@@ -19,10 +20,10 @@ info:
     - Add a product review
     - Create a user
     - Retrieve user profile
-    - Retrieve the user wishlist (TODO)
-    - Add a product into the wishlist (TODO)
-    - Delete a specific product from mt wishlist (TODO)
-    - Clear the wishlist (TODO)
+    - Retrieve the user wishlist
+    - Add a product into the wishlist
+    - Delete a specific product from the wishlist
+    - Clear the wishlist
 
 
 produces:
@@ -45,8 +46,9 @@ securityDefinitions:
         - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
     flow: implicit
     scopes:
-      'write:products': modify products
-      'write:wishlist': read and modify your wishlist
+      'write:products': modify products      
+      'write:wishlist': modify your wishlist
+      'read:wishlist': read your wishlist
       'read:reviews': read all reviews
       'write:reviews': write reviews
       'read:reviews:stats': read review statistics
@@ -58,7 +60,7 @@ paths:
     x-summary: Wishlist
 
     get:
-      summary: The API Root
+      summary: API Root
       description: Retrieve the API Root
 
       responses:
@@ -72,7 +74,8 @@ paths:
     x-summary: List of Products
 
     get:
-      summary: Retrieve List of Products
+      summary: List of Products
+      description: Retrieve the whole list of products
       parameters:
         - name: offset
           in: query
@@ -121,7 +124,8 @@ paths:
             $ref: '#/definitions/halProducts'
 
     post:
-      summary: Create a New Product
+      summary: New Product
+      description: Create a new product
       consumes:
         - application/json
       parameters:
@@ -152,7 +156,8 @@ paths:
         x-example: 'DB1124'
 
     get:
-      summary: Retrieve Product
+      summary: Get Product
+      description: Retrieve product details
       responses:
         200:
           description: A particular Product
@@ -169,6 +174,7 @@ paths:
 
     patch:
       summary: Update Product
+      description: Update product details
       consumes:
         - application/json
       parameters:
@@ -200,7 +206,8 @@ paths:
         x-example: 'DB1124'
 
     get:
-      summary: Retrieve List of a Product Reviews
+      summary: List product reviews
+      description: Retrieve a list of product reviews
       parameters:
         - name: offset
           in: query
@@ -226,7 +233,8 @@ paths:
           - 'read:reviews'
 
     post:
-      summary: Create a New Product Review
+      summary: Create product review
+      description: Create a new product review
       consumes:
         - application/json
       parameters:
@@ -247,39 +255,21 @@ paths:
 
 
   /users:
-
     x-summary: Users
 
-    post:
-      summary: Create a New User
-      consumes:
-        - application/json
-      parameters:
-        - name: Video
-          in: body
-          description: Video to be created
-          required: true
-          schema:
-            $ref: '#/definitions/user'
-      responses:
-        201:
-          description: Newly created video
-          schema:
-            $ref: '#/definitions/halUser'
-      security:
-        - oauth2:
-          - 'write:users'
+    # Add API definition for user creation. It should be a POST action consuming a JSON object user defined in the definitions at the bottom of this file. It should repond with 201 Created for a successful action. Don't forget about the oauth scopes. this one should allow to create new users.
+    # -------------------------------------------------------------------------------------------
+    # post:
+    #   summary: Create a New User
+
 
   /users/{user_id}:
     x-summary: User Profile
 
-    parameters:
-      - name: user_id
-        in: path
-        description: Id of the User
-        required: true
-        type: string
-        x-example: 'xxxxx'
+    # This endpoint will require a parameter in it's path. Please define this parameter below. Remember, that the parameter's name has to relate to the one put in the path above. Don't forget about setting its type.
+    # -------------------------------------------------------------------------------------------
+    # parameters:
+
 
     get:
       summary: Get the User Profile
@@ -292,6 +282,34 @@ paths:
         - oauth2:
           - 'read:users'
 
+  # Create a new user wishlist endpoint. Add a retrieval and clearing affordances (respectively GET and DELETE http verbs). The list of products on the wishlist should have the '#/definitions/halWishlist' model. The correct response for the deletion action should be a 204. Don't forget about x-summary for the endpoint, security definition and scopes and any required parameters.
+  # ---------------------------------------------------------------------------------------------
+  # /users/{user_id}/...
+
+
+  # Similarly define two affordances for adding and deleting particular products from a wishlist (POST and DELETE). Both of them should should be at the same endpoint. Remember, that the POST action will consume a JSON document.
+  # ---------------------------------------------------------------------------------------------
+  # /users/{user_id}/...
+  # x-summary: User Product Wishlist
+  # parameters:
+  #   - name: user_id
+  #     in: path
+  #     description: Id of the User
+  #     required: true
+  #     type: string
+  #     x-example: '32312'
+
+  #   - name: product_id
+  #     in: path
+  #     description: Id of the Product
+  #     required: true
+  #     type: string
+  #     x-example: 'DB1124'
+
+  # post:
+
+
+# You can leave this part as it is
 definitions:
   #
   # API Root
