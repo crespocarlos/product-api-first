@@ -3,8 +3,8 @@ info:
   version: '1.0.0'
   title: "[Hackathon] Adidas Wishlist API"
   contact:
-      name: "Samir AMZANI / Ignacio Alzorriz"
-      email: "samir.amzani@adidas.com"
+      name: "Andrzej Jarzyna / Samir AMZANI / Ignacio Alzorriz"
+      email: "andrzej.jarzyna@adidas.com"
   description: |
     A Simple adidas product API for the On-Boarding hackathon.
     [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon
@@ -21,6 +21,8 @@ info:
     - Retrieve user profile
     - Retrieve the user wishlist
     - Add a product into the wishlist
+    - Delete a specific product from the wishlist
+    - Clear the wishlist
 
 
 produces:
@@ -43,8 +45,9 @@ securityDefinitions:
         - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
     flow: implicit
     scopes:
-      'write:products': modify products
-      'write:wishlist': read and modify your wishlist
+      'write:products': modify products      
+      'write:wishlist': modify your wishlist
+      'read:wishlist': read your wishlist
       'read:reviews': read all reviews
       'write:reviews': write reviews
       'read:reviews:stats': read review statistics
@@ -356,6 +359,15 @@ paths:
       security:
         - oauth2:
           - 'read:wishlist'
+          
+    delete:
+      summary: Clear the User Wishlist
+      responses:
+        204:
+          description: Wishlist cleared
+      security:
+        - oauth2:
+          - 'write:wishlist'
 
   /users/{user_id}/wishlist/{product_id}:
     x-summary: User Product Wishlist
@@ -394,8 +406,15 @@ paths:
       security:
       - oauth2:
         - 'write:wishlist'
-
-
+        
+    delete:
+      summary: Delete a product from the wishlist
+      responses:
+        204:
+          description: Wishlist cleared
+      security:
+        - oauth2:
+          - 'write:wishlist'
 
 definitions:
   #
@@ -653,7 +672,7 @@ definitions:
         reviewCount: 122
         averageRating: 4.3
         history:
-          - $ref: '#/definitions/halReviewStatsItem/example'
+          - $ref: '#/definitions/halReviewStatsItem'
 
 
   # HAL Wrapper
