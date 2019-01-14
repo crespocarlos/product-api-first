@@ -7,7 +7,7 @@
 - [Draw.io](https://www.draw.io/)
 - Git
 - Code editor
-- Docker 
+<!-- - Docker  -->
 
 
 ## Setup
@@ -16,7 +16,7 @@
 
 2. Edit and check the swagger file `swagger.yaml`
 
-3. Build the api image
+<!-- 3. Build the api image
 
 This is only needed if you want to try the implementation of the designed API + API contract testing
 
@@ -28,7 +28,7 @@ make build
 
 ```
 make run
-```
+``` -->
 
 
 ## Design challenge
@@ -80,7 +80,7 @@ The existing core Product API privides this affordances:
 
 ## Step3. Formalize the design in the [Open API Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
-> The OAS file can be edited in whatever tool you like *BUT NOT GENERATED FROM YOUR CODE*, the most important thing is that the aprouved one (the contract) *MUST* be in Apiary.
+> The OAS file can be edited in whatever tool you like *BUT NOT GENERATED FROM YOUR CODE*. We suggest either using [Swagger Editor](https://editor.swagger.io) or VS Code with extensions. The most important thing is that the final one (the contract) *MUST* be in Apiary.
 
 **TASK**: Extend the existing swagger.yaml
 
@@ -115,11 +115,11 @@ If your API looks like this remote control then your design is affordant!
 - Setup up Github/apiary Sync
 
 
-## Step7. Setup API contract testing
+<!-- ## Step7. Setup API contract testing
 
 >Every API description (contract) using HTTP(S) protocol MUST be tested against its API implementation. The tests MUST be executed using the Dredd testing framework. The Dredd MUST report the test results to Apiary. In addition to local runs, the tests SHOULD be an integral part the API implementation's CI/CD pipeline. The CI/CD pipeline SHOULD be configured to run the test whenever there is a change to either API description (contract) or its implementation.
 
-- **TASK**: Install and run [dredd](https://github.com/apiaryio/dredd)
+- **TASK**: Install and run [dredd](https://github.com/apiaryio/dredd) -->
 
 
 ## Some example of bad designed APIs
