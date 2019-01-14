@@ -78,7 +78,7 @@ The existing core Product API privides this affordances:
 
 
 
-## Step3. Formalize the design in the [Open API Specification](http://swagger.io/specification/)
+## Step3. Formalize the design in the [Open API Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
 > The OAS file can be edited in whatever tool you like *BUT NOT GENERATED FROM YOUR CODE*, the most important thing is that the aprouved one (the contract) *MUST* be in Apiary.
 
