@@ -59,7 +59,7 @@ paths:
     x-summary: Wishlist
 
     get:
-      summary: The API Root
+      summary: API Root
       description: Retrieve the API Root
 
       responses:
@@ -73,7 +73,8 @@ paths:
     x-summary: List of Products
 
     get:
-      summary: Retrieve List of Products
+      summary: List of Products
+      description: Retrieve the whole list of products
       parameters:
         - name: offset
           in: query
@@ -122,7 +123,8 @@ paths:
             $ref: '#/definitions/halProducts'
 
     post:
-      summary: Create a New Product
+      summary: New Product
+      description: Create a new product
       consumes:
         - application/json
       parameters:
@@ -153,7 +155,8 @@ paths:
         x-example: 'DB1124'
 
     get:
-      summary: Retrieve Product
+      summary: Get Product
+      description: Retrieve product details
       responses:
         200:
           description: A particular Product
@@ -170,6 +173,7 @@ paths:
 
     patch:
       summary: Update Product
+      description: Update product details
       consumes:
         - application/json
       parameters:
@@ -201,7 +205,8 @@ paths:
         x-example: 'DB1124'
 
     get:
-      summary: Retrieve List of a Product Reviews
+      summary: List product reviews
+      description: Retrieve a list of product reviews
       parameters:
         - name: offset
           in: query
@@ -227,7 +232,8 @@ paths:
           - 'read:reviews'
 
     post:
-      summary: Create a New Product Review
+      summary: Create product review
+      description: Create a new product review
       consumes:
         - application/json
       parameters:
@@ -259,7 +265,8 @@ paths:
         x-example: 'DB1124'
 
     get:
-      summary: Retrieve List of a Product Reviews Stats
+      summary: List product reviews stats
+      description: Retrieve a list of product reviews statistics
       parameters:
         - name: offset
           in: query
@@ -297,7 +304,8 @@ paths:
     x-summary: Users
 
     post:
-      summary: Create a New User
+      summary: New user
+      description: Create a new user
       consumes:
         - application/json
       parameters:
@@ -328,7 +336,8 @@ paths:
         x-example: 'xxxxx'
 
     get:
-      summary: Get the User Profile
+      summary: User Profile
+      description: Retrieve user profile details
       responses:
         200:
           description: A particular User Profile
@@ -350,7 +359,8 @@ paths:
         x-example: '32312'
 
     get:
-      summary: Get the User Wishlist
+      summary: User Wishlist
+      description: Retrieve user wishlist
       responses:
         200:
           description: A particular User Wishlist
@@ -361,7 +371,8 @@ paths:
           - 'read:wishlist'
           
     delete:
-      summary: Clear the User Wishlist
+      summary: Clear user wishlist
+      description: Clear all the products from user wishlist
       responses:
         204:
           description: Wishlist cleared
@@ -388,7 +399,8 @@ paths:
         x-example: 'DB1124'
 
     post:
-      summary: Add a Product To The Wishlist
+      summary: Add product to the wishlist
+      description: Add a product to user wishlist
       consumes:
         - application/json
       parameters:
@@ -409,6 +421,7 @@ paths:
         
     delete:
       summary: Delete a product from the wishlist
+      description: Delete a product from user wishlist
       responses:
         204:
           description: Wishlist cleared
