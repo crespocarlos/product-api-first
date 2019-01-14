@@ -309,15 +309,15 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: Video
+        - name: User
           in: body
-          description: Video to be created
+          description: User to be created
           required: true
           schema:
             $ref: '#/definitions/user'
       responses:
         201:
-          description: Newly created video
+          description: Newly created user
           schema:
             $ref: '#/definitions/halUser'
       security:
