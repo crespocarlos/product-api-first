@@ -1,0 +1,471 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: "[Onboarding] Adidas Wishlist API"
+  # Change the contact details to yours.
+  contact:
+      name: "Andrzej Jarzyna / Samir AMZANI / Ignacio Alzorriz"
+      email: "andrzej.jarzyna@adidas.com"
+  description: |
+    A Simple adidas product API for the On-Boarding hackathon.
+    [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon
+
+    ## Affordances
+    This API affords the following actions:
+    - Retrieve the list of products
+    - Retrieve a single product
+    - Create a product
+    - Update an existing product (status...)
+    - Retrieve reviews about a product
+    - Add a product review
+    - Create a user
+    - Retrieve user profile
+    - Retrieve user wishlist
+    - Add a product into the wishlist
+    - Delete a specific product from the wishlist
+    - Clear the wishlist
+
+produces:
+  - application/hal+json      # Representation message format
+  - application/problem+json  # Error message format
+
+schemes:
+  - https
+
+securityDefinitions:
+  oauth2:
+    type: oauth2
+    authorizationUrl: 'http://example/oauth'
+    description: |
+
+      There are three available roles in the application:
+
+        - Anonymous -> can log in, log out, see products, see general ratings from a product.
+        - User -> all from Anonymous + following scopes: write:wishlist, read:reviews, write:reviews.
+        - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
+    flow: implicit
+    scopes:
+      'read:products': read all products 
+      'write:products': modify products      
+      'write:wishlist': modify your wishlist
+      'read:wishlist': read your wishlist
+      'read:reviews': read all reviews
+      'write:reviews': write reviews
+      'read:reviews:stats': read review statistics
+      'read:users': read users
+      'write:users': modify users
+
+paths:
+  /:
+    x-summary: Wishlist
+
+    get:
+      summary: API Root
+      description: Retrieve the API Root
+
+      responses:
+        200:
+          description: The root of the API
+          schema:
+            $ref: '#/definitions/halRoot'
+
+
+definitions:
+  #
+  # API Root
+  #
+  halRoot:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+    example:
+      _links:
+        self:
+          href: /
+        products:
+          href: /products
+        product:
+          href: /product/{product_id}
+        users:
+          href: /users
+
+  #
+  # Product Resource
+  #
+  halProducts:
+    type: object
+    properties:
+      productCount:
+        type: number
+    allOf:
+      - $ref: '#/definitions/halResource'
+    example:
+      _links:
+        self:
+          href: /products
+
+        create:
+          href: /products
+
+        next:
+          href: /products?offset=5&limit=5
+
+        first:
+          href: /products?offset=0&limit=5
+
+        last:
+          href: /products?offset=40&limit=5
+
+      _embedded:
+        product:
+          - $ref: '#/definitions/halProduct/example'
+
+  # Product HAL Wrapper
+  halProduct:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+      - $ref: '#/definitions/product'
+    example:
+      _links:
+        self:
+          href: /products/DB1124
+
+        edit:
+          href: /products/DB1124
+
+        delete:
+          href: /products/DB1124
+      id: 'DB1124'
+      title: 'My Product title'
+      description : 'An example of a product description'
+      category: 'lorem'
+      status: 'available'
+      image: 'https://cdn.sportsshoes.com/product/A/ADI8522/ADI8522_200_1.jpg'
+      tags: ['beyond', 'zapitilla', 'zaragoza']
+      createdAt: '2017-06-21T14:07:17Z'
+
+
+  # Partial Product
+  productPatch:
+    type: object
+    allOf:
+      - $ref: '#/definitions/product'
+    example:
+      status: 'out'
+
+  # Product
+  product:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      category:
+        type: string
+      status:
+        type: string
+        enum:
+        - available
+        - pending
+        - sold
+        - out
+        default: available
+      images:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+      createdAt:
+        type: string
+    required:
+      - title
+      - description
+      - category
+    example:
+      id: 'DB1124'
+      title: 'My Product title'
+      description : 'An example of a product description'
+      category: 'lorem'
+      status: 'available'
+      image: 'https://cdn.sportsshoes.com/product/A/ADI8522/ADI8522_200_1.jpg'
+      tags: ['beyond', 'zapitilla', 'zaragoza']
+      createdAt: '2017-06-21T14:07:17Z'
+
+
+  # Product Not Found Error
+  productNotFound:
+    type: object
+    allOf:
+      - $ref: '#/definitions/problemDetail'
+    example:
+      title: 'Not Found'
+      detail: 'Cannot find the requested product'
+      status: 404
+      instance: '/products/DB1124'
+
+
+  #
+  # Review Resource
+  #
+  halReviews:
+    type: object
+    properties:
+      reviewCount:
+        type: number
+      averageRating:
+        type: number
+    allOf:
+      - $ref: '#/definitions/halResource'
+    example:
+      _links:
+        self:
+          href: /products/{product_id}/reviews
+          templated: true
+
+        create:
+          href: /products/{product_id}/reviews
+          templated: true
+
+        next:
+          href: /products/{product_id}/reviews?offset=5&limit=5
+          templated: true
+
+        first:
+          href: /products/{product_id}/reviews?offset=0&limit=5
+          templated: true
+
+        last:
+          href: /products/{product_id}/reviews?offset=40&limit=5
+          templated: true
+
+      _embedded:
+        reviewCount: 122
+        averageRating: 4.3
+        review:
+          - $ref: '#/definitions/halReview/example'
+
+  # HAL Wrapper
+  halReview:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+      - $ref: '#/definitions/review'
+    example:
+      _links:
+        self:
+          href: /products/{product_id}/reviews
+          templated: true
+      id: 'DB1124'
+      comment: 'This is a review comment example'
+      rating: 4.3
+      createdAt: '2017-06-21T14:07:17Z'
+
+
+  # Review
+  review:
+    type: object
+    properties:
+      id:
+        type: string
+      comment:
+        type: string
+      rating:
+        type: number
+      createdAt:
+        type: string
+    required:
+      - comment
+      - rating
+    example:
+      id: 'DB1124'
+      comment: 'This is a review comment example'
+      rating: 4.3
+      createdAt: '2017-06-21T14:07:17Z'
+
+
+
+  # HAL Wrapper
+  halReviewStatsItem:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+      - $ref: '#/definitions/reviewStatsItem'
+    example:
+      date: '2017-06-21T14:07:17Z'
+      rating: 4.3
+
+
+  # Review Stats
+  reviewStatsItem:
+    type: object
+    properties:
+      id:
+        type: string
+      comment:
+        type: string
+      rating:
+        type: number
+      createdAt:
+        type: string
+        readOnly: true
+    required:
+      - comment
+      - rating
+    example:
+      id: 'DB1124'
+      comment: 'This is a review comment example'
+      rating: 4.3
+      createdAt: '2017-06-21T14:07:17Z'
+
+#
+  # User Resource
+  #
+
+  # HAL Wrapper
+  halUser:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+      - $ref: '#/definitions/user'
+    example:
+      _links:
+        self:
+          href: /users/{user_id}
+          templated: true
+      id: '232333'
+      username: 'Sam'
+      createdAt: '2017-06-21T14:07:17Z'
+
+
+  # Review
+  user:
+    type: object
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+      password:
+        type: string
+      createdAt:
+        type: string
+    required:
+      - username
+      - password
+    example:
+      id: '232333'
+      username: 'Sam'
+      createdAt: '2017-06-21T14:07:17Z'
+
+  # User Not Found Error
+  userNotFound:
+    type: object
+    allOf:
+      - $ref: '#/definitions/problemDetail'
+    example:
+      title: 'Not Found'
+      detail: 'Cannot find any user with this id'
+      status: 404
+      instance: '/users/{user_id}'
+
+
+
+  #
+  # -- DO NOT EDIT BEYOND THIS POINT --
+  #
+
+  # Media Types Definitions
+
+  #
+  # application/problem+json
+  #
+  problemDetail:
+    type: object
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      status:
+        type: number
+      detail:
+        type: string
+      instance:
+        type: string
+    required:
+      - title
+      - detail
+
+  #
+  # application/hal+json defintion
+  #
+  halLinkObject:
+    type: object
+    required:
+      - href
+    properties:
+      href:
+        type: string
+      templated:
+        type: boolean
+      type:
+        type: string
+      deprecation:
+        type: string
+      name:
+        type: string
+      profile:
+        type: string
+      title:
+        type: string
+      hreflang:
+        type: string
+
+  halCuriesLink:
+    title: HAL Curies Link
+    allOf:
+      - type: object
+        properties:
+          templated:
+            enum:
+              - true
+        required:
+          - templated
+      - $ref: '#/definitions/halLinkObject'
+
+  halResource:
+    title: HAL Resource Object
+    type: object
+    properties:
+      _links:
+        type: object
+        additionalProperties:
+          # WARN: Should be "anyOf" but "anyOf" isn't supported in Swagger 2.0
+          allOf:
+            - $ref: '#/definitions/halLinkObject'
+            - type: array
+              items:
+                - $ref: '#/definitions/halLinkObject'
+        properties:
+          curies:
+            # WARN: Should be "anyOf" but "anyOf" isn't supported in Swagger 2.0
+            allOf:
+              - $ref: '#/definitions/halCuriesLink'
+              - type: array
+                items:
+                  - $ref: '#/definitions/halCuriesLink'
+      _embedded:
+        type: object
+        additionalProperties: true
+        # WARN: Apiary doesn't support circular references
+        # additionalProperties:
+        #   anyOf:
+        #     - $ref: '#/definitions/hal_resource'
+        #     - type: array
+        #       items:
+        #         - $ref: '#/definitions/hal_resource'
