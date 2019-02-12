@@ -20,18 +20,17 @@ info:
     - Add a product review
     - Create a user
     - Retrieve user profile
-    - Retrieve the user wishlist
+    - Retrieve user wishlist
     - Add a product into the wishlist
     - Delete a specific product from the wishlist
     - Clear the wishlist
-
 
 produces:
   - application/hal+json      # Representation message format
   - application/problem+json  # Error message format
 
 schemes:
-  - http
+  - https
 
 securityDefinitions:
   oauth2:
@@ -46,6 +45,7 @@ securityDefinitions:
         - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
     flow: implicit
     scopes:
+      'read:products': read all products 
       'write:products': modify products      
       'write:wishlist': modify your wishlist
       'read:wishlist': read your wishlist
@@ -122,6 +122,9 @@ paths:
           description: The list of Products
           schema:
             $ref: '#/definitions/halProducts'
+      security:
+        - oauth2:
+          - 'read:products'
 
     post:
       summary: New Product
@@ -171,6 +174,9 @@ paths:
               default: application/problem+json
           schema:
             $ref: '#/definitions/productNotFound'
+      security:
+        - oauth2:
+          - 'read:products'
 
     patch:
       summary: Update Product
@@ -257,6 +263,27 @@ paths:
   /users:
     x-summary: Users
 
+    post:
+      summary: New user
+      description: Create a new user
+      consumes:
+        - application/json
+      parameters:
+        - name: User
+          in: body
+          description: User to be created
+          required: true
+          schema:
+            $ref: '#/definitions/user'
+      responses:
+        201:
+          description: Newly created user
+          schema:
+            $ref: '#/definitions/halUser'
+      security:
+        - oauth2:
+          - 'write:users'
+
     # Add API definition for user creation. It should be a POST action consuming a JSON object user defined in the definitions at the bottom of this file. It should repond with 201 Created for a successful action. Don't forget about the oauth scopes. this one should allow to create new users.
     # -------------------------------------------------------------------------------------------
     # post:
@@ -269,7 +296,13 @@ paths:
     # This endpoint will require a parameter in it's path. Please define this parameter below. Remember, that the parameter's name has to relate to the one put in the path above. Don't forget about setting its type.
     # -------------------------------------------------------------------------------------------
     # parameters:
-
+    parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: 'xxxxx'
 
     get:
       summary: Get the User Profile
@@ -282,12 +315,12 @@ paths:
         - oauth2:
           - 'read:users'
 
-  # Create a new user wishlist endpoint. Add a retrieval and clearing affordances (respectively GET and DELETE http verbs). The list of products on the wishlist should have the '#/definitions/halWishlist' model. The correct response for the deletion action should be a 204. Don't forget about x-summary for the endpoint, security definition and scopes and any required parameters.
+  # Create a new endpoint for a user wishlist. Add a retrieval and clearing affordances (respectively GET and DELETE HTTP verbs). The list of products on the wishlist should have the '#/definitions/halWishlist' model. The correct response for the DELETE action should be a 204. What are the results of a 204 response code? Don't forget about x-summary for the endpoint, security definition and scopes and any required parameters.
   # ---------------------------------------------------------------------------------------------
   # /users/{user_id}/...
 
 
-  # Similarly define two affordances for adding and deleting particular products from a wishlist (POST and DELETE). Both of them should should be at the same endpoint. Remember, that the POST action will consume a JSON document.
+  # Similarly, define two affordances for adding and deleting particular products from a wishlist (POST and DELETE). Both of them should should be at the same endpoint. Remember, that the POST action will consume a JSON document.
   # ---------------------------------------------------------------------------------------------
   # /users/{user_id}/...
   # x-summary: User Product Wishlist
@@ -324,8 +357,8 @@ definitions:
           href: /
         products:
           href: /products
-        reviews:
-          href: /reviews
+        product:
+          href: /product/{product_id}
         users:
           href: /users
 

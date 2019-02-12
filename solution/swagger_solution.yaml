@@ -30,7 +30,7 @@ produces:
   - application/problem+json  # Error message format
 
 schemes:
-  - http
+  - https
 
 securityDefinitions:
   oauth2:
@@ -45,6 +45,7 @@ securityDefinitions:
         - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
     flow: implicit
     scopes:
+      'read:products': read all products 
       'write:products': modify products      
       'write:wishlist': modify your wishlist
       'read:wishlist': read your wishlist
@@ -121,6 +122,9 @@ paths:
           description: The list of Products
           schema:
             $ref: '#/definitions/halProducts'
+      security:
+        - oauth2:
+          - 'read:products'
 
     post:
       summary: New Product
@@ -170,6 +174,9 @@ paths:
               default: application/problem+json
           schema:
             $ref: '#/definitions/productNotFound'
+      security:
+        - oauth2:
+          - 'read:products'
 
     patch:
       summary: Update Product
@@ -443,10 +450,8 @@ definitions:
           href: /
         products:
           href: /products
-        reviews:
-          href: /reviews
-        wishlist:
-          href: /wishlist
+        product:
+          href: /products/{product_id}
         users:
           href: /users
 
