@@ -306,8 +306,12 @@ paths:
         - oauth2:
           - 'read:reviews:stats'
 
-  /users:
+    # Add API definition for user creation. It should be a POST action consuming a JSON object user defined in the definitions at the bottom of this file. It should repond with 201 Created for a successful action. Don't forget about the oauth scopes. this one should allow to create new users.
+    # -------------------------------------------------------------------------------------------
+    # post:
+    #   summary: Create a New User
 
+  /users:
     x-summary: Users
 
     post:
@@ -330,6 +334,11 @@ paths:
       security:
         - oauth2:
           - 'write:users'
+
+  
+    # This endpoint will require a parameter in it's path. Please define this parameter below. Remember, that the parameter's name has to relate to the one put in the path above. Don't forget about setting its type.
+    # -------------------------------------------------------------------------------------------
+    # parameters:
 
   /users/{user_id}:
     x-summary: User Profile
