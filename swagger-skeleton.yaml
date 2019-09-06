@@ -4,8 +4,8 @@ info:
   title: "[Onboarding] Adidas Wishlist API"
   # Change the contact details to yours.
   contact:
-      name: "Andrzej Jarzyna / Samir AMZANI / Ignacio Alzorriz"
-      email: "andrzej.jarzyna@adidas.com"
+      name: "Carlos Crespo"
+      email: "carlos.henrique.crespo@adidas.com"
   description: |
     A Simple adidas product API for the On-Boarding hackathon.
     [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon

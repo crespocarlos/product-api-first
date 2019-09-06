@@ -4,8 +4,8 @@ info:
   title: "[Onboarding] Adidas Wishlist API"
   # Change the contact details to yours.
   contact:
-      name: "Andrzej Jarzyna / Samir AMZANI / Ignacio Alzorriz"
-      email: "andrzej.jarzyna@adidas.com"
+      name: "Carlos Crepso"
+      email: "carlos.henrique.crespo@adidas.com"
   description: |
     A Simple adidas product API for the On-Boarding hackathon.
     [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon
@@ -310,6 +310,35 @@ paths:
   # ---------------------------------------------------------------------------------------------
   # /users/{user_id}/...
 
+   /users/{user_id}/wishlist:
+    x-summary: User Wishlist
+
+    parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: 'xxxxx'
+    get:
+      summary: Get the user whishlist
+      responses:
+        200:
+          description: A particular User Wishlist
+          schema:
+            $ref: '#/definitions/halWishlist'
+      security:
+        - oauth2:
+          - 'read:users'
+    delete:
+      summary: Remove the user whishlist
+      responses:
+        204:
+          description: The wishlist was deleted successfully.
+      security:
+        - oauth2:
+          - 'write:users'
+
 
   # Similarly, define two affordances for adding and deleting particular products from a wishlist (POST and DELETE). Both of them should should be at the same endpoint. Remember, that the POST action will consume a JSON document.
   # ---------------------------------------------------------------------------------------------
@@ -331,6 +360,54 @@ paths:
   #     x-example: 'DB1124'
 
   # post:
+
+  /users/{user_id}/wishlist/{product_id}:
+    x-summary: User Product Wishlist
+
+    parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: '32312'
+
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: 'DB1124'
+        
+    delete:
+      summary: Delete a product from the wishlist
+      description: Delete a product from user wishlist
+      responses:
+        204:
+          description: The product was deleted successfully from the wishlist
+      security:
+        - oauth2:
+          - 'write:wishlist'
+    post:
+      summary: Add product to the wishlist
+      description: Add a product to user wishlist
+      consumes:
+        - application/json
+      parameters:
+        - name: WishlistProduct
+          in: body
+          description: Product to be added to the wishlist.
+          required: true
+          schema:
+            $ref: '#/definitions/halWishlist'
+      responses:
+        201:
+          description: Newly added product to the Wishlist
+          schema:
+            $ref: 'https://design.api.3stripes.io/v1/domains/adidas_Org/wishlist-models/1.0.0#/definitions/halWishProduct'
+      security:
+        - oauth2:
+          - 'write:wishlist'
 
 
 # You can leave this part as it is
@@ -601,6 +678,8 @@ definitions:
         self:
           href: /users/{user_id}
           templated: true
+        whishlist:
+          href: /users/{user_id}/wishlist
       id: '232333'
       username: 'Sam'
       createdAt: '2017-06-21T14:07:17Z'
@@ -636,6 +715,56 @@ definitions:
       detail: 'Cannot find any user with this id'
       status: 404
       instance: '/users/{user_id}'
+
+  
+  halWishlist:
+    type: object
+    properties:
+      wishlistCount:
+        type: number
+    allOf:
+      - $ref: '#/definitions/halResource'
+    example:
+      _links:
+        self:
+          href: /users/{user_id}/wishlist
+          templated: true
+
+        create:
+          href: /users/{user_id}/wishlist
+          templated: true
+
+      _embedded:
+        wishlistCount: 122
+        wishlist:
+          - $ref: '#/definitions/halWishProduct/example'
+
+  halWishProduct:
+    type: object
+    allOf:
+      - $ref: '#/definitions/halResource'
+      - $ref: '#/definitions/wishProduct'
+    example:
+      _links:
+        self:
+          href: /products/{product_id}
+          templated: true
+      id: 'DB1124'
+      createdAt: '2017-06-21T14:07:17Z'
+
+  wishProduct:
+    type: object
+    properties:
+      id:
+        type: string
+      createdAt:
+        type: string
+        readOnly: true
+    required:
+      - id
+    example:
+      id: 'DB1124'
+      createdAt: '2017-06-21T14:07:17Z'
 
 
 
