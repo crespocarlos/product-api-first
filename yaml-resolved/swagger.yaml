@@ -1,0 +1,588 @@
+---
+swagger: "2.0"
+info:
+  description: |
+    A Simple adidas product API for the On-Boarding hackathon.
+    [On-Boarding trainings](https://tools.adidas-group.com/confluence/display/DSBP/Engineers+On-Boarding+trainings) hackathon
+
+    ## Affordances
+    This API affords the following actions:
+    - Retrieve the list of products
+    - Retrieve a single product
+    - Create a product
+    - Update an existing product (status...)
+    - Retrieve reviews about a product
+    - Add a product review
+    - Create a user
+    - Retrieve user profile
+    - Retrieve the user wishlist
+    - Add a product into the wishlist
+    - Delete a specific product from the wishlist
+    - Clear the wishlist
+  version: 1.0.0
+  title: '[Onboarding] Adidas Wishlist API'
+  contact:
+    name: Carlos Crespo
+    email: carlos.henrique.leonel.crespo@adidas.com
+host: design.api.3stripes.io
+basePath: /virts/adidas/wishlist-api/1.0.0
+schemes:
+- https
+produces:
+- application/hal+json
+- application/problem+json
+paths:
+  /:
+    get:
+      summary: API Root
+      description: Retrieve the API Root
+      parameters: []
+      responses:
+        200:
+          description: The root of the API
+          schema:
+            $ref: '#/definitions/halRoot'
+    x-summary: Wishlist
+  /products:
+    get:
+      summary: List of Products
+      description: Retrieve the whole list of products
+      parameters:
+      - name: offset
+        in: query
+        description: Number of results to skip from the start of the list
+        required: false
+        type: string
+        default: "0"
+        x-example: "10"
+      - name: limit
+        in: query
+        description: The maximum number of reusults to return
+        required: false
+        type: string
+        default: "10"
+        x-example: "5"
+      - name: status
+        in: query
+        description: Statuses to filter by. Retrieved products must match any of the given statuses.
+        required: false
+        type: array
+        items:
+          type: string
+          enum:
+          - available
+          - pending
+          - sold
+          - out
+        collectionFormat: csv
+      - name: tags
+        in: query
+        description: Tags to filter by. Retrieved products must match all given tags.
+        required: false
+        type: array
+        items:
+          type: number
+        collectionFormat: csv
+      - name: category
+        in: query
+        description: Category to filter by. Retrieved products must match given category.
+        required: false
+        type: number
+      responses:
+        200:
+          description: The list of Products
+          schema:
+            $ref: '#/definitions/halProducts'
+      security:
+      - oauth2:
+        - read:products
+    post:
+      summary: New Product
+      description: Create a new product
+      consumes:
+      - application/json
+      parameters:
+      - in: body
+        name: Product
+        description: Product to be created
+        required: true
+        schema:
+          $ref: '#/definitions/product'
+      responses:
+        201:
+          description: Newly created product
+          schema:
+            $ref: '#/definitions/halProduct'
+      security:
+      - oauth2:
+        - write:products
+    x-summary: List of Products
+  /products/{product_id}:
+    get:
+      summary: Get Product
+      description: Retrieve product details
+      parameters:
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      responses:
+        200:
+          description: A particular Product
+          schema:
+            $ref: '#/definitions/halProduct'
+        404:
+          description: The requested Product wasn't found
+          headers:
+            Content-Type:
+              type: string
+              default: application/problem+json
+          schema:
+            $ref: '#/definitions/productNotFound'
+      security:
+      - oauth2:
+        - read:products
+    patch:
+      summary: Update Product
+      description: Update product details
+      consumes:
+      - application/json
+      parameters:
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      - in: body
+        name: Product
+        description: Partial Product update
+        required: true
+        schema:
+          $ref: '#/definitions/productPatch'
+      responses:
+        200:
+          description: The Product was updated
+          schema:
+            $ref: '#/definitions/halProduct'
+      security:
+      - oauth2:
+        - write:products
+    x-summary: Product
+  /products/{product_id}/reviews:
+    get:
+      summary: List product reviews
+      description: Retrieve a list of product reviews
+      parameters:
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      - name: offset
+        in: query
+        description: Number of results to skip from the start of the list
+        required: false
+        type: string
+        default: "0"
+        x-example: "10"
+      - name: limit
+        in: query
+        description: The maximum number of reusults to return
+        required: false
+        type: string
+        default: "10"
+        x-example: "5"
+      responses:
+        200:
+          description: The list of Product review
+          schema:
+            $ref: '#/definitions/halReviews'
+      security:
+      - oauth2:
+        - read:reviews
+    post:
+      summary: Create product review
+      description: Create a new product review
+      consumes:
+      - application/json
+      parameters:
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      - in: body
+        name: Review
+        description: Review to be created
+        required: true
+        schema:
+          $ref: '#/definitions/review'
+      responses:
+        201:
+          description: Newly created product
+          schema:
+            $ref: '#/definitions/halReview'
+      security:
+      - oauth2:
+        - write:reviews
+    x-summary: List of Product Reviews
+  /products/{product_id}/reviews-stats:
+    get:
+      summary: List product reviews stats
+      description: Retrieve a list of product reviews statistics
+      parameters:
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      - name: offset
+        in: query
+        description: Number of results to skip from the start of the list
+        required: false
+        type: string
+        default: "0"
+        x-example: "10"
+      - name: limit
+        in: query
+        description: The maximum number of reusults to return
+        required: false
+        type: string
+        default: "10"
+        x-example: "5"
+      - name: granularity
+        in: query
+        required: false
+        type: string
+        default: months
+        enum:
+        - years
+        - months
+        - days
+      responses:
+        200:
+          description: The list of Product review
+          schema:
+            $ref: '#/definitions/halReviewsStats'
+      security:
+      - oauth2:
+        - read:reviews:stats
+    x-summary: List of Product Reviews Stats
+  /users:
+    post:
+      summary: New user
+      description: Create a new user
+      consumes:
+      - application/json
+      parameters:
+      - in: body
+        name: User
+        description: User to be created
+        required: true
+        schema:
+          $ref: '#/definitions/user'
+      responses:
+        201:
+          description: Newly created user
+          schema:
+            $ref: '#/definitions/halUser'
+      security:
+      - oauth2:
+        - write:users
+    x-summary: Users
+  /users/{user_id}:
+    get:
+      summary: User Profile
+      description: Retrieve user profile details
+      parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: xxxxx
+      responses:
+        200:
+          description: A particular User Profile
+          schema:
+            $ref: '#/definitions/halUser'
+      security:
+      - oauth2:
+        - read:users
+    x-summary: User Profile
+  /users/{user_id}/wishlist:
+    get:
+      summary: User Wishlist
+      description: Retrieve user wishlist
+      parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: "32312"
+      responses:
+        200:
+          description: A particular User Wishlist
+          schema:
+            $ref: '#/definitions/halWishlist'
+      security:
+      - oauth2:
+        - read:wishlist
+    post:
+      summary: Add product to the wishlist
+      description: Add a product to user wishlist
+      consumes:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: "32312"
+      - in: body
+        name: WishlistProduct
+        description: Product to be added to the wishlist.
+        required: true
+        schema:
+          $ref: '#/definitions/wishProduct'
+      responses:
+        201:
+          description: Newly added product to the Wishlist
+          schema:
+            $ref: '#/definitions/halWishProduct'
+      security:
+      - oauth2:
+        - write:wishlist
+    delete:
+      summary: Clear user wishlist
+      description: Clear all the products from user wishlist
+      parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: "32312"
+      responses:
+        204:
+          description: Wishlist cleared
+      security:
+      - oauth2:
+        - write:wishlist
+    x-summary: User Wishlist
+  /users/{user_id}/wishlist/{product_id}:
+    delete:
+      summary: Delete a product from the wishlist
+      description: Delete a product from user wishlist
+      parameters:
+      - name: user_id
+        in: path
+        description: Id of the User
+        required: true
+        type: string
+        x-example: "32312"
+      - name: product_id
+        in: path
+        description: Id of the Product
+        required: true
+        type: string
+        x-example: DB1124
+      responses:
+        204:
+          description: Wishlist cleared
+      security:
+      - oauth2:
+        - write:wishlist
+    x-summary: User Product Wishlist
+securityDefinitions:
+  oauth2:
+    description: |2
+
+      There are three available roles in the application:
+
+        - Anonymous -> can log in, log out, see products, see general ratings from a product.
+        - User -> all from Anonymous + following scopes: write:wishlist, read:reviews, write:reviews.
+        - Admin -> all from Anonymous + following scopes: write:products, read:reviews, read:reviews:stats, read:users, write:users.
+    type: oauth2
+    authorizationUrl: https://example/oauth
+    flow: implicit
+    scopes:
+      read:products: read all products
+      write:products: modify products
+      write:wishlist: modify your wishlist
+      read:wishlist: read your wishlist
+      read:reviews: read all reviews
+      write:reviews: write reviews
+      read:reviews:stats: read review statistics
+      read:users: read users
+      write:users: modify users
+definitions:
+  halRoot:
+    allOf:
+    - $ref: '#/definitions/halResource'
+  halResource:
+    type: object
+    properties:
+      _links:
+        type: object
+        additionalProperties:
+          type: object
+          allOf:
+          - $ref: '#/definitions/halLinkObject'
+          - type: array
+            items:
+              $ref: '#/definitions/halLinkObject'
+      _embedded:
+        type: object
+        properties: {}
+    title: HAL Resource Object
+  halLinkObject:
+    type: object
+    required:
+    - href
+    properties:
+      href:
+        type: string
+      templated:
+        type: boolean
+      type:
+        type: string
+      deprecation:
+        type: string
+      name:
+        type: string
+      profile:
+        type: string
+      title:
+        type: string
+      hreflang:
+        type: string
+  halProducts:
+    allOf:
+    - $ref: '#/definitions/halResource'
+  product:
+    type: object
+    required:
+    - category
+    - description
+    - title
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      category:
+        type: string
+      status:
+        type: string
+        default: available
+        enum:
+        - available
+        - pending
+        - sold
+        - out
+      images:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+    example:
+      title: My Product title
+      description: An example of a product description
+      category: lorem
+      status: available
+      image: https://cdn.sportsshoes.com/product/A/ADI8522/ADI8522_200_1.jpg
+      tags:
+      - beyond
+      - zapitilla
+      - zaragoza
+  halProduct:
+    allOf:
+    - $ref: '#/definitions/halResource'
+    - $ref: '#/definitions/product'
+  productNotFound:
+    allOf:
+    - $ref: '#/definitions/problemDetail'
+  problemDetail:
+    type: object
+    required:
+    - detail
+    - title
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      status:
+        type: number
+      detail:
+        type: string
+      instance:
+        type: string
+  productPatch:
+    allOf:
+    - $ref: '#/definitions/product'
+  halReviews:
+    allOf:
+    - $ref: '#/definitions/halResource'
+  review:
+    type: object
+    required:
+    - comment
+    - rating
+    properties:
+      comment:
+        type: string
+      rating:
+        type: number
+    example:
+      comment: This is a review comment example
+      rating: 4.3
+  halReview:
+    allOf:
+    - $ref: '#/definitions/halResource'
+    - $ref: '#/definitions/review'
+  halReviewsStats:
+    allOf:
+    - $ref: '#/definitions/halResource'
+  user:
+    type: object
+    required:
+    - password
+    - username
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+    example:
+      username: Sam
+  halUser:
+    allOf:
+    - $ref: '#/definitions/halResource'
+    - $ref: '#/definitions/user'
+  halWishlist:
+    allOf:
+    - $ref: '#/definitions/halResource'
+  wishProduct:
+    type: object
+    required:
+    - productId
+    properties:
+      productId:
+        type: string
+    example:
+      productId: DB1124
+  halWishProduct:
+    allOf:
+    - $ref: '#/definitions/halResource'
+    - $ref: '#/definitions/wishProduct'
